@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-frontend
+  namespace: demo
+  labels: { app: demo-frontend }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: demo-frontend }
+  template:
+    metadata:
+      labels: { app: demo-frontend }
+    spec:
+      containers:
+        - name: frontend
+          image: demo-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              value: http://demo-backend:8080
+          readinessProbe:
+            httpGet: { path: /healthz, port: 80 }
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 50m, memory: 32Mi }
+            limits:   { memory: 128Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-frontend
+  namespace: demo
+spec:
+  type: NodePort
+  selector: { app: demo-frontend }
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080         # http://localhost:30080

@@ -1,0 +1,24 @@
+services:
+  backend:
+    build: ./backend
+    image: demo-backend:latest
+    environment:
+      APP_ENV: docker
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  frontend:
+    build: ./frontend
+    image: demo-frontend:latest
+    environment:
+      BACKEND_URL: http://backend:8080   # compose servis adı = DNS adı
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy

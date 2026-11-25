@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: demo-backend
+
+app:
+  env: ${APP_ENV:local}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true   # /actuator/health/liveness ve /readiness
